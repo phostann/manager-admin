@@ -6,6 +6,7 @@ export default {
   'menu.project': '项目列表',
   'menu.project.node': '项目节点',
   'menu.project.resource': '项目资源',
+  'menu.project.config': '项目配置',
   'menu.admin.sub-page': '二级管理页',
   'menu.login': '登录',
   'menu.register': '注册',

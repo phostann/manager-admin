@@ -47,6 +47,12 @@ export default [
     component: './Project/Resource',
   },
   {
+    hideInMenu: true,
+    name: 'project.config',
+    path: '/project/:id/config',
+    component: './Project/Config',
+  },
+  {
     name: 'list.table-list',
     icon: 'table',
     path: '/list',

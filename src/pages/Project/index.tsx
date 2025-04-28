@@ -2,10 +2,11 @@ import { getProjectList, IProject, IProjectPageParams } from '@/services/project
 import { EllipsisOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useQuery } from '@tanstack/react-query';
-import { Button, Dropdown, DropDownProps, Form, Input } from 'antd';
-import Table, { ColumnProps } from 'antd/es/table';
-import { useState } from 'react';
 import { history } from '@umijs/max';
+import { Button, Dropdown, Form, Input } from 'antd';
+import Table, { ColumnProps } from 'antd/es/table';
+import { MenuInfo } from 'rc-menu/lib/interface';
+import { useState } from 'react';
 
 export default function Project() {
   const [queryForm] = Form.useForm<Pick<IProjectPageParams, 'name'>>();
@@ -20,14 +21,16 @@ export default function Project() {
     queryFn: () => getProjectList(params),
   });
 
-  const handleMenuClick: NonNullable<DropDownProps['menu']>['onClick'] = (e) => {
-    console.log(e.key);
-    switch (e.key) {
+  const handleMenuClick = (info: MenuInfo, id: number) => {
+    switch (info.key) {
       case 'resource':
-        history.push(`/project/${e.key}/resource`);
+        history.push(`/project/${id}/resource`);
         break;
       case 'node':
-        history.push(`/project/${1}/node`);
+        history.push(`/project/${id}/node`);
+        break;
+      case 'edit-config':
+        history.push(`/project/${id}/config`);
         break;
 
       default:
@@ -59,16 +62,19 @@ export default function Project() {
     {
       title: '操作',
       dataIndex: 'action',
-      render: () => (
+      render: (_, record) => (
         <Dropdown
           menu={{
             items: [
               { label: '资源管理', key: 'resource' },
               { label: '节点管理', key: 'node' },
               { label: '编辑项目', key: 'edit' },
+              { label: '编辑配置', key: 'edit-config' },
               { label: '删除项目', key: 'delete', danger: true },
             ],
-            onClick: handleMenuClick,
+            onClick: (e) => {
+              handleMenuClick(e, record.id);
+            },
           }}
         >
           <EllipsisOutlined className="cursor-pointer" />
