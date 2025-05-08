@@ -40,13 +40,11 @@ export const getProjectConfig = async (id: string): Promise<IResponse<IProjectCo
   return request.get(`/project/${id}/config`);
 };
 
-export interface IUpdateProjectConfigParams {
-  config: string;
+export interface IUpdateProjectPayload {
+  name?: string;
+  config?: string;
 }
 
-export const updateProjectConfig = async (
-  id: number,
-  params: IUpdateProjectConfigParams,
-): Promise<IResponse<IProject>> => {
-  return request.put(`/project/${id}/config`, { data: params });
+export const updateProject = async (id: number, params: IUpdateProjectPayload): Promise<void> => {
+  return request.put(`/project/${id}`, params);
 };

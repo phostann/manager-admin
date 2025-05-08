@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { PageContainer } from '@ant-design/pro-components';
-import { Card, message, Spin, Alert, Button, Space } from 'antd';
-import { useParams } from '@umijs/max';
 import YamlEditor from '@/components/YamlEditor';
-import { getProjectById, updateProjectConfig } from '@/services/project';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getProjectById, updateProject } from '@/services/project';
+import { PageContainer } from '@ant-design/pro-components';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useParams } from '@umijs/max';
+import { Alert, Button, Card, message, Space, Spin } from 'antd';
+import { useEffect, useState } from 'react';
 
 export default function ProjectConfig() {
   const { id } = useParams<{ id: string }>();
@@ -15,18 +15,18 @@ export default function ProjectConfig() {
 
   // 查询项目配置
   const { data, isLoading, error } = useQuery({
-    queryKey: ['project-config', id],
+    queryKey: ['project-detail', id],
     queryFn: () => getProjectById(Number(id)),
     enabled: !!id,
   });
 
   // 更新项目配置
   const mutation = useMutation({
-    mutationFn: (config: string) => updateProjectConfig(Number(id), { config }),
+    mutationFn: (config: string) => updateProject(Number(id), { config }),
     onSuccess: () => {
       message.success('配置保存成功');
       setEditMode(false);
-      queryClient.invalidateQueries({ queryKey: ['project-config', id] });
+      queryClient.invalidateQueries({ queryKey: ['project-detail', id] });
     },
     onError: (err) => {
       message.error('配置保存失败');
@@ -63,21 +63,24 @@ export default function ProjectConfig() {
 
   // 处理保存按钮点击
   const handleSaveClick = () => {
-    console.log('保存编辑后的配置:', editedContent);
+    if (editedContent === null || editedContent.replace(/\s/g, '') === '') {
+      message.error('配置不能为空');
+      return;
+    }
     mutation.mutate(editedContent);
   };
 
   // 处理编辑器内容变更
   const handleContentChange = (value: string) => {
     setEditedContent(value);
+    console.log('value', value);
   };
 
   return (
     <PageContainer
       title="项目配置"
       extra={
-        !isLoading &&
-        yamlContent && (
+        !isLoading && (
           <Space>
             {!editMode ? (
               <Button type="primary" onClick={handleEditClick}>
@@ -112,7 +115,7 @@ export default function ProjectConfig() {
               {yamlContent || editMode ? (
                 <YamlEditor
                   value={editMode ? editedContent : yamlContent}
-                  onChange={editMode ? handleContentChange : undefined}
+                  onChange={handleContentChange}
                   readOnly={!editMode}
                   height="600px"
                 />
